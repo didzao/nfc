@@ -43,8 +43,8 @@ body {
   height: 56px;
   width: 100px;
   border: none;
-  border-radius: 16px;
   font-weight: bold;
+  border-radius: 16px;
   color: whitesmoke;
   background-color: #007bff;
   font-family: "Poppins", sans-serif;
@@ -55,9 +55,9 @@ body {
   }
 
   &:active {
-    transform: scale(0.96); // Dá a sensação de "apertar"
-    background-color: #0056b3;
     filter: none;
+    transform: scale(0.96);
+    background-color: #0056b3;
   }
 }
 
@@ -71,5 +71,12 @@ body {
 
   &:active {
     background-color: #1e7e34;
+  }
+}
+
+@media (max-width: 768px) {
+  .button-container {
+    row-gap: 25px;
+    flex-direction: column;
   }
 }

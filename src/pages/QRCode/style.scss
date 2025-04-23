@@ -102,6 +102,11 @@ body {
   border-radius: 6px;
 }
 
+.qr-scanner {
+  width: "100%";
+  max-width: 300px;
+}
+
 @media (max-width: 768px) {
   .action-container {
     row-gap: 8px;

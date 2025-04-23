@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import qrCodeLogo from "../../assets/qr-code.svg";
 import backArrow from "../../assets/back-arrow.svg";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 import QRCode from "react-qr-code"; // Usando react-qr-code agora
 import { useNavigate } from "react-router-dom";
 import "./style.scss";
@@ -40,17 +40,41 @@ const QRCodePage = () => {
     setStatus(`❌ Erro: ${errorMessage}`);
   };
 
-  const handleStartScan = () => {
+  const handleStartScan = async () => {
     setStatus("Aguardando leitura...");
     setShowScanner(true);
 
-    // Configuração do scanner do html5-qrcode
-    const config = {
-      fps: 10,
-      qrbox: 250,
-    };
-    const scanner = new Html5QrcodeScanner("qr-scanner", config);
-    scanner.render(handleScanSuccess, handleScanError);
+    setTimeout(async () => {
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length > 0) {
+          const backCamera =
+            devices.find((device) =>
+              device.label.toLowerCase().includes("back")
+            ) || devices[0];
+
+          const scanner = new Html5Qrcode("qr-scanner");
+          await scanner.start(
+            backCamera.id,
+            { fps: 10, qrbox: 250 },
+            (decodedText) => {
+              setQrData(decodedText);
+              setStatus("✅ QR Code lido com sucesso!");
+              scanner.stop();
+              setShowScanner(false);
+            },
+            (errorMessage) => {
+              console.warn(errorMessage);
+            }
+          );
+        } else {
+          setStatus("❌ Nenhuma câmera encontrada");
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus("❌ Erro ao acessar a câmera");
+      }
+    }, 100);
   };
 
   const handleGenerate = () => {
@@ -107,11 +131,7 @@ const QRCodePage = () => {
   const renderScanner = () => {
     if (!showScanner) return null;
 
-    return (
-      <div id="qr-scanner" className="qr-scanner">
-        {/* O scanner será renderizado aqui */}
-      </div>
-    );
+    return <div id="qr-scanner" className="qr-scanner" />;
   };
 
   const renderGenerate = () => {
@@ -119,7 +139,7 @@ const QRCodePage = () => {
 
     return (
       <div className="qr-generated">
-        <QRCode value={qrData} size={200} />
+        <QRCode value={qrData} size={256} />
       </div>
     );
   };

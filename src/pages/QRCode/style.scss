@@ -8,8 +8,8 @@ body {
 .container {
   display: flex;
   height: 100vh;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
   background-color: #f4f6f8;
 }
 
@@ -31,12 +31,10 @@ body {
 }
 
 .content {
-  gap: 2rem;
   display: flex;
   height: 100vh;
   align-items: center;
   flex-direction: column;
-  justify-content: center;
 }
 
 .status {
@@ -45,11 +43,12 @@ body {
   text-align: center;
 }
 
-.button-container {
+.action-container {
   width: 100vw;
   display: flex;
+  column-gap: 10rem;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
 }
 
 .button-scan {
@@ -74,27 +73,16 @@ body {
   }
 }
 
-.button-write {
-  @extend .button-scan;
-  background-color: #28a745;
-
-  &:hover {
-    filter: drop-shadow(0 0 2em #28a745);
-  }
-
-  &:active {
-    background-color: #1e7e34;
-  }
-}
-
 .input-container {
   gap: 1rem;
   display: flex;
+  gap: 1em;
+  flex-direction: column;
 }
 
-.button-record {
+.button-generate {
+  width: 100%;
   @extend .button-scan;
-  width: fit-content;
   background-color: #f3960ca8;
 
   &:hover {
@@ -115,8 +103,8 @@ body {
 }
 
 @media (max-width: 768px) {
-  .button-container {
-    row-gap: 25px;
+  .action-container {
+    row-gap: 8px;
     flex-direction: column;
   }
 

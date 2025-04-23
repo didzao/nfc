@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import qrCodeLogo from "../../assets/qr-code.svg";
 import backArrow from "../../assets/back-arrow.svg";
-import "./style.scss";
-import QrReader from "react-qr-reader";
-import { QRCode } from "qrcode.react";
+import { Html5QrcodeScanner } from "html5-qrcode";
+import QRCode from "react-qr-code"; // Usando react-qr-code agora
 import { useNavigate } from "react-router-dom";
+import "./style.scss";
 
 const QRCodePage = () => {
   const [status, setStatus] = useState("");
@@ -13,17 +13,16 @@ const QRCodePage = () => {
   const [name, setName] = useState("");
   const [id, setId] = useState("");
   const [showGenerated, setShowGenerated] = useState(false);
-
   const navigate = useNavigate();
 
   const goToHome = useCallback(() => {
     navigate("/");
-  }, []);
+  }, [navigate]);
 
   const renderHeader = () => {
     return (
       <div className="header">
-        <a href="" onClick={goToHome} className="back-button">
+        <a href="#" onClick={goToHome} className="back-button">
           <img width={50} src={backArrow} alt="botão voltar" />
         </a>
         <img src={qrCodeLogo} alt="QrCode Logo" width={100} />
@@ -31,22 +30,27 @@ const QRCodePage = () => {
     );
   };
 
-  const handleScan = (data) => {
-    if (data) {
-      setQrData(data);
-      setStatus("✅ Presença confirmada!");
-      setShowScanner(false);
-    }
+  const handleScanSuccess = (decodedText) => {
+    setQrData(decodedText);
+    setStatus("✅ QR Code lido com sucesso!");
+    setShowScanner(false);
   };
 
-  const handleError = (err) => {
-    console.error(err);
-    setStatus("❌ Erro ao acessar a câmera");
+  const handleScanError = (errorMessage) => {
+    setStatus(`❌ Erro: ${errorMessage}`);
   };
 
   const handleStartScan = () => {
     setStatus("Aguardando leitura...");
     setShowScanner(true);
+
+    // Configuração do scanner do html5-qrcode
+    const config = {
+      fps: 10,
+      qrbox: 250,
+    };
+    const scanner = new Html5QrcodeScanner("qr-scanner", config);
+    scanner.render(handleScanSuccess, handleScanError);
   };
 
   const handleGenerate = () => {
@@ -56,35 +60,18 @@ const QRCodePage = () => {
     }
     setQrData(JSON.stringify({ nome: name, id }));
     setShowGenerated(true);
+    setName("");
+    setId("");
     setStatus("✅ QR Code gerado!");
-  };
-
-  const renderButtons = () => {
-    return (
-      <div className="button-container">
-        <button className="button-scan" onClick={handleStartScan}>
-          Ler QR Code
-        </button>
-        <button className="button-write" onClick={handleGenerate}>
-          Gerar QR Code
-        </button>
-      </div>
-    );
-  };
-
-  const renderStatus = () => {
-    if (!qrData) return null;
-
-    return <p className="status">Conteúdo da tag: {qrData}</p>;
   };
 
   const renderInput = () => {
     return (
-      <div className="form">
+      <div className="input-container">
         <input
+          value={name}
           className="input"
           placeholder="Nome"
-          value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <input
@@ -100,17 +87,29 @@ const QRCodePage = () => {
     );
   };
 
+  const renderButtons = () => {
+    return (
+      <div className="action-container">
+        <button className="button-scan" onClick={handleStartScan}>
+          Ler QR Code
+        </button>
+        {renderInput()}
+      </div>
+    );
+  };
+
+  const renderStatus = () => {
+    if (!qrData) return null;
+
+    return <p className="status">Conteúdo do QR Code: {qrData}</p>;
+  };
+
   const renderScanner = () => {
     if (!showScanner) return null;
 
     return (
-      <div className="qr-scanner">
-        <QrReader
-          delay={300}
-          onError={handleError}
-          onScan={handleScan}
-          style={{ width: "100%" }}
-        />
+      <div id="qr-scanner" className="qr-scanner">
+        {/* O scanner será renderizado aqui */}
       </div>
     );
   };
@@ -120,11 +119,19 @@ const QRCodePage = () => {
 
     return (
       <div className="qr-generated">
-        <p>QR Code para:</p>
         <QRCode value={qrData} size={200} />
       </div>
     );
   };
+
+  useEffect(() => {
+    return () => {
+      if (showScanner) {
+        const scanner = new Html5QrcodeScanner("qr-scanner");
+        scanner.clear();
+      }
+    };
+  }, [showScanner]);
 
   return (
     <>
@@ -132,11 +139,10 @@ const QRCodePage = () => {
         {renderHeader()}
         <div className="content">
           <p className="status">{status}</p>
-          {renderGenerate()}
-          {renderInput()}
           {renderButtons()}
           {renderScanner()}
           {renderStatus()}
+          {renderGenerate()}
         </div>
       </div>
     </>

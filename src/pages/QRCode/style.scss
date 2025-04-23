@@ -48,6 +48,7 @@ body {
 .action-container {
   width: 100vw;
   display: flex;
+  flex-direction: row;
   column-gap: 10rem;
   align-items: center;
   justify-content: center;
@@ -95,6 +96,20 @@ body {
   }
 }
 
+.button-download {
+  @extend .button-scan;
+  width: fit-content;
+  background-color: #28a745;
+
+  &:hover {
+    filter: drop-shadow(0 0 2em #28a745);
+  }
+
+  &:active {
+    background-color: #1e7e34;
+  }
+}
+
 .input {
   border: none;
   height: 54px;
@@ -109,8 +124,11 @@ body {
 }
 
 .qr-generated {
+  display: flex;
+  column-gap: 2em;
+  justify-content: center;
+  align-items: center;
   height: 100%;
-  background-color: yellow;
 }
 
 @media (max-width: 768px) {

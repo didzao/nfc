@@ -1,17 +1,19 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import qrCodeLogo from "../../assets/qr-code.svg";
 import backArrow from "../../assets/back-arrow.svg";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import QRCode from "react-qr-code"; // Usando react-qr-code agora
+import QRCode from "react-qr-code";
 import { useNavigate } from "react-router-dom";
 import "./style.scss";
 
 const QRCodePage = () => {
+  const qrRef = useRef(null);
   const [status, setStatus] = useState("");
   const [qrData, setQrData] = useState("");
   const [showScanner, setShowScanner] = useState(false);
   const [name, setName] = useState("");
   const [id, setId] = useState("");
+  const [qrCodeName, setQrCodeName] = useState("");
   const [showGenerated, setShowGenerated] = useState(false);
   const navigate = useNavigate();
 
@@ -43,14 +45,6 @@ const QRCodePage = () => {
   const handleStartScan = () => {
     setStatus("Aguardando leitura...");
     setShowScanner(true);
-
-    // Configuração do scanner do html5-qrcode
-    const config = {
-      fps: 10,
-      qrbox: 250,
-    };
-    const scanner = new Html5QrcodeScanner("qr-scanner", config);
-    scanner.render(handleScanSuccess, handleScanError);
   };
 
   const handleGenerate = () => {
@@ -60,6 +54,7 @@ const QRCodePage = () => {
     }
     setQrData(JSON.stringify({ nome: name, id }));
     setShowGenerated(true);
+    setQrCodeName(name);
     setName("");
     setId("");
     setStatus("✅ QR Code gerado!");
@@ -115,19 +110,57 @@ const QRCodePage = () => {
 
     return (
       <div className="qr-generated">
-        <QRCode value={qrData} size={256} />
+        <QRCode value={qrData} size={256} ref={qrRef} />
+        <button className="button-download" onClick={handleDownload}>
+          Baixar QR Code
+        </button>
       </div>
     );
   };
 
   useEffect(() => {
+    if (!showScanner) return;
+
+    const config = {
+      fps: 10,
+      qrbox: 250,
+    };
+
+    const scanner = new Html5QrcodeScanner("qr-scanner", config);
+
+    scanner.render(handleScanSuccess, handleScanError);
+
     return () => {
-      if (showScanner) {
-        const scanner = new Html5QrcodeScanner("qr-scanner");
-        scanner.clear();
-      }
+      scanner.clear().catch((err) => {
+        console.warn("Erro ao limpar scanner:", err);
+      });
     };
   }, [showScanner]);
+
+  const handleDownload = () => {
+    const svg = qrRef.current;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const img = new Image();
+    img.onload = function () {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const pngFile = canvas.toDataURL("image/png");
+
+      const downloadLink = document.createElement("a");
+
+      const fileName = qrCodeName
+        ? `qrcode-${qrCodeName.replace(/\s+/g, "_")}.png`
+        : "qrcode.png";
+      downloadLink.download = fileName;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
+  };
 
   return (
     <>

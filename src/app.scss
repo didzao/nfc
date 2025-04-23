@@ -18,9 +18,9 @@ body {
 }
 
 .content {
+  gap: 2rem;
   display: flex;
   height: 100vh;
-  row-gap: 30px;
   align-items: center;
   flex-direction: column;
   justify-content: center;
@@ -74,9 +74,43 @@ body {
   }
 }
 
+.input-container {
+  gap: 1rem;
+  display: flex;
+}
+
+.button-record {
+  @extend .button-scan;
+  width: fit-content;
+  background-color: #f3960ca8;
+
+  &:hover {
+    filter: drop-shadow(0 0 2em #f3960ca8);
+  }
+
+  &:active {
+    background-color: #9a5f06a8;
+  }
+}
+
+.input {
+  border: none;
+  height: 54px;
+  font-size: 1rem;
+  min-width: 20rem;
+  border-radius: 6px;
+}
+
 @media (max-width: 768px) {
   .button-container {
     row-gap: 25px;
+    flex-direction: column;
+  }
+
+  .input-container {
+    display: flex;
+    row-gap: 10px;
+    align-items: center;
     flex-direction: column;
   }
 }

@@ -3,8 +3,10 @@ import nfcLogo from "/nfc.svg";
 import "./app.scss";
 
 const App = () => {
-  const [nfcData, setNfcData] = useState("");
   const [status, setStatus] = useState("");
+  const [nfcData, setNfcData] = useState("");
+  const [showInput, setShowInput] = useState(false);
+  const [textToWrite, setTextToWrite] = useState("");
 
   const handleReadNFC = async () => {
     if (!("NDEFReader" in window)) {
@@ -31,10 +33,14 @@ const App = () => {
   const handleWriteNFC = async () => {
     try {
       const writer = new NDEFReader();
-      await writer.write("Olá do React!");
+      await writer.write(textToWrite);
       setStatus("✅ Tag escrita com sucesso!");
+      setShowInput(false);
+      setTextToWrite("");
     } catch (err) {
       setStatus("❌ Erro ao escrever na tag");
+      setShowInput(false);
+      setTextToWrite("");
       console.error(err);
     }
   };
@@ -45,6 +51,43 @@ const App = () => {
     return <p className="status">Conteúdo da tag: {nfcData}</p>;
   };
 
+  const handleStartWrite = () => {
+    setShowInput(true);
+    setStatus("");
+  };
+
+  const renderInput = () => {
+    if (!showInput) return null;
+
+    return (
+      <div className="input-container ">
+        <input
+          type="text"
+          className="input"
+          value={textToWrite}
+          placeholder="Digite o que deseja gravar"
+          onChange={(e) => setTextToWrite(e.target.value)}
+        />
+        <button className="button-record" onClick={handleWriteNFC}>
+          Gravar na tag
+        </button>
+      </div>
+    );
+  };
+
+  const renderButtons = () => {
+    return (
+      <div className="button-container">
+        <button className="button-scan" onClick={handleReadNFC}>
+          Ler
+        </button>
+        <button className="button-write" onClick={handleStartWrite}>
+          Escrever
+        </button>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="container">
@@ -53,14 +96,8 @@ const App = () => {
         </div>
         <div className="content">
           <p className="status">{status}</p>
-          <div className="button-container">
-            <button className="button-scan" onClick={handleReadNFC}>
-              Ler
-            </button>
-            <button className="button-write" onClick={handleWriteNFC}>
-              Escrever
-            </button>
-          </div>
+          {renderButtons()}
+          {renderInput()}
           {renderStatus()}
         </div>
       </div>

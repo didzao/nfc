@@ -93,10 +93,10 @@ const QRCodePage = () => {
     );
   };
 
-  const renderStatus = () => {
+  const renderQRCodeData = () => {
     if (!qrData) return null;
 
-    return <p className="status">Conteúdo do QR Code: {qrData}</p>;
+    return <span className="status">Conteúdo do QR Code: {qrData}</span>;
   };
 
   const renderScanner = () => {
@@ -167,10 +167,10 @@ const QRCodePage = () => {
       <div className="container">
         {renderHeader()}
         <div className="content">
-          <p className="status">{status}</p>
           {renderButtons()}
           {renderScanner()}
-          {renderStatus()}
+          <span className="status">{status}</span>
+          {renderQRCodeData()}
           {renderGenerate()}
         </div>
       </div>

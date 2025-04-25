@@ -2,6 +2,7 @@
 
 body {
   margin: 0;
+  background-color: #f4f6f8;
   font-family: "Poppins", sans-serif;
 }
 
@@ -10,13 +11,13 @@ body {
   height: 100vh;
   align-items: center;
   flex-direction: column;
-  background-color: #f4f6f8;
 }
 
 .header {
   width: 100vw;
   display: flex;
   padding-top: 16px;
+  margin-bottom: 32px;
   align-items: center;
   justify-content: center;
 }
@@ -36,7 +37,6 @@ body {
   align-items: center;
   padding-bottom: 32px;
   flex-direction: column;
-  background-color: #f4f6f8;
 }
 
 .status {
@@ -48,8 +48,8 @@ body {
 .action-container {
   width: 100vw;
   display: flex;
-  flex-direction: row;
   column-gap: 10rem;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }
@@ -124,11 +124,11 @@ body {
 }
 
 .qr-generated {
+  height: 100%;
   display: flex;
   column-gap: 2em;
-  justify-content: center;
   align-items: center;
-  height: 100%;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
@@ -142,5 +142,18 @@ body {
     row-gap: 10px;
     align-items: center;
     flex-direction: column;
+  }
+
+  .qr-generated {
+    gap: 1rem;
+    flex-direction: column;
+  }
+
+  .button-scan {
+    width: 320px;
+  }
+
+  .button-download {
+    width: 256px;
   }
 }
